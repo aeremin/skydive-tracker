@@ -2,6 +2,9 @@ import {Injectable} from '@nestjs/common';
 import {HttpService} from "@nestjs/axios";
 import {firstValueFrom} from "rxjs";
 
+const kMinSecondsBetweenLoads = 60;
+const kMinLoadDurationSeconds = 180;
+
 interface Aircraft {
   hex: string;
   type: string;
@@ -80,7 +83,9 @@ export class AppService {
       if (ac != undefined) {
         this.current_load.points.push({...ac, now});
       } else {
-        this.onLoadFinished()
+        if ((now - this.current_load.points[this.current_load.points.length - 1].now) / 1000 > kMinSecondsBetweenLoads) {
+          this.onLoadFinished()
+        }
       }
     }
   }
@@ -99,8 +104,10 @@ export class AppService {
         total_points: this.current_load.points.length,
         max_altitude: Math.max(...this.current_load.points.map(p => p.alt_baro))
       };
-      console.log(JSON.stringify(aggregated));
-      this.loads.push(aggregated);
+      if (aggregated.total_seconds >= kMinLoadDurationSeconds) {
+        console.log(JSON.stringify(aggregated));
+        this.loads.push(aggregated);
+      }
     } else {
       console.error(`Raw load is empty after filtering: ${JSON.stringify(this.current_load)}`);
     }

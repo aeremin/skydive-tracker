@@ -8,7 +8,7 @@ interface Aircraft {
   flight: string;
   r: string;
   t: string;
-  alt_baro: number;
+  alt_baro?: number;
   squawk: string;
   rr_lat: number;
   rr_lon: number;
@@ -29,7 +29,11 @@ interface AdsbResponse {
 
 const kPlaneIcao = '3D72AB';
 
-interface JumpLoad {
+interface RawJumpLoad {
+  points: (Aircraft & { now: number })[];
+}
+
+interface AggregatedJumpLoad {
   start_timestamp: number;
   start_altitude: number;
 
@@ -37,54 +41,70 @@ interface JumpLoad {
   finish_altitude: number;
 
   max_altitude: number;
+
+  total_seconds: number;
+
+  total_points: number;
 }
 
 @Injectable()
 export class AppService {
-  private loads: JumpLoad[] = [];
-  private current_load: JumpLoad|undefined = undefined;
+  private loads: AggregatedJumpLoad[] = [];
+  private current_load: RawJumpLoad|undefined = undefined;
   constructor(private readonly httpService: HttpService) {
     this.downloadData();
     setInterval(async () => this.downloadData(), 10000);
   }
 
   async getData() {
-    return {message: `Loads info: ${JSON.stringify(this.loads)}`};
+    return {message: `Current load: ${JSON.stringify(this.current_load)}, Loads info: ${JSON.stringify(this.loads)}`};
   }
 
-  async downloadData() {
-    const r = await firstValueFrom(this.httpService.get<AdsbResponse>(`https://api.adsb.one/v2/hex/${kPlaneIcao}`));
-    this.onNewData(r.data.now, r.data.ac[0]);
+  private async downloadData() {
+    try {
+      const r = await firstValueFrom(this.httpService.get<AdsbResponse>(`https://api.adsb.one/v2/hex/${kPlaneIcao}`));
+      this.onNewData(r.data.now, r.data.ac[0]);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  onNewData(now: number, ac: Aircraft|undefined){
+  private onNewData(now: number, ac: Aircraft|undefined){
     if (this.current_load == undefined) {
       if (ac != undefined) {
-        // New load
         this.current_load = {
-          start_timestamp: now,
-          start_altitude: ac.alt_baro,
-          finish_timestamp: now,
-          finish_altitude: ac.alt_baro,
-          max_altitude: ac.alt_baro,
+          points: [{...ac, now}]
         }
       }
     } else {
       if (ac != undefined) {
-        // Ongoing load
-        this.current_load = {
-          ...this.current_load,
-          finish_timestamp: now,
-          finish_altitude: ac.alt_baro,
-          max_altitude: Math.max(this.current_load.max_altitude, ac.alt_baro),
-        }
+        this.current_load.points.push({...ac, now});
       } else {
-        // Finished load
-        console.log(JSON.stringify(this.current_load));
-        this.loads.push(this.current_load);
-        this.current_load = undefined;
+        this.onLoadFinished()
       }
     }
+  }
+
+  private onLoadFinished() {
+    this.current_load.points = this.current_load.points.filter(p => p.alt_baro != undefined);
+    if (this.current_load.points.length > 0) {
+      const aggregated: AggregatedJumpLoad = {
+        start_timestamp: this.current_load.points[0].now,
+        start_altitude: this.current_load.points[0].alt_baro,
+
+        finish_timestamp: this.current_load.points[this.current_load.points.length - 1].now,
+        finish_altitude: this.current_load.points[this.current_load.points.length - 1].alt_baro,
+
+        total_seconds: (this.current_load.points[this.current_load.points.length - 1].now - this.current_load.points[0].now) / 1000,
+        total_points: this.current_load.points.length,
+        max_altitude: Math.max(...this.current_load.points.map(p => p.alt_baro))
+      };
+      console.log(JSON.stringify(aggregated));
+      this.loads.push(aggregated);
+    } else {
+      console.error(`Raw load is empty after filtering: ${JSON.stringify(this.current_load)}`);
+    }
+    this.current_load = undefined;
   }
 }
 

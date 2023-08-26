@@ -83,11 +83,15 @@ export class AppService {
       if (ac != undefined) {
         this.current_load.points.push({...ac, now});
       } else {
-        if ((now - this.current_load.points[this.current_load.points.length - 1].now) / 1000 > kMinSecondsBetweenLoads) {
+        if ((now - this.lastPoint().now) / 1000 > kMinSecondsBetweenLoads) {
           this.onLoadFinished()
         }
       }
     }
+  }
+
+  private lastPoint() {
+    return this.lastPoint();
   }
 
   private onLoadFinished() {
@@ -97,10 +101,10 @@ export class AppService {
         start_timestamp: this.current_load.points[0].now,
         start_altitude: this.current_load.points[0].alt_baro,
 
-        finish_timestamp: this.current_load.points[this.current_load.points.length - 1].now,
-        finish_altitude: this.current_load.points[this.current_load.points.length - 1].alt_baro,
+        finish_timestamp: this.lastPoint().now,
+        finish_altitude: this.lastPoint().alt_baro,
 
-        total_seconds: (this.current_load.points[this.current_load.points.length - 1].now - this.current_load.points[0].now) / 1000,
+        total_seconds: (this.lastPoint().now - this.current_load.points[0].now) / 1000,
         total_points: this.current_load.points.length,
         max_altitude: Math.max(...this.current_load.points.map(p => p.alt_baro))
       };

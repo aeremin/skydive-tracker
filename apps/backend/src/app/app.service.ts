@@ -1,6 +1,9 @@
+import {Firestore} from '@google-cloud/firestore';
 import {Injectable} from '@nestjs/common';
 import {HttpService} from "@nestjs/axios";
 import {firstValueFrom} from "rxjs";
+
+const firestore = new Firestore({databaseId: 'skydive-tracker'});
 
 const kMinSecondsBetweenLoads = 60;
 const kMinLoadDurationSeconds = 180;
@@ -32,8 +35,10 @@ interface AdsbResponse {
 
 const kPlaneIcao = '3D72AB';
 
+type AircraftWithTime = Aircraft & { now: number };
+
 interface RawJumpLoad {
-  points: (Aircraft & { now: number })[];
+  points: AircraftWithTime[];
 }
 
 interface AggregatedJumpLoad {
@@ -66,13 +71,14 @@ export class AppService {
   private async downloadData() {
     try {
       const r = await firstValueFrom(this.httpService.get<AdsbResponse>(`https://api.adsb.one/v2/hex/${kPlaneIcao}`));
-      this.onNewData(r.data.now, r.data.ac[0]);
+      await this.onNewData(r.data.now, r.data.ac[0]);
     } catch (e) {
       console.error(e);
     }
   }
 
-  private onNewData(now: number, ac: Aircraft|undefined){
+  private async onNewData(now: number, ac: Aircraft|undefined){
+    await firestore.collection('data_points').add({...ac, now});
     if (this.current_load == undefined) {
       if (ac != undefined) {
         this.current_load = {
@@ -84,7 +90,7 @@ export class AppService {
         this.current_load.points.push({...ac, now});
       } else {
         if ((now - this.lastPoint().now) / 1000 > kMinSecondsBetweenLoads) {
-          this.onLoadFinished()
+          await this.onLoadFinished()
         }
       }
     }
@@ -94,7 +100,7 @@ export class AppService {
     return this.lastPoint();
   }
 
-  private onLoadFinished() {
+  private async onLoadFinished() {
     this.current_load.points = this.current_load.points.filter(p => p.alt_baro != undefined);
     if (this.current_load.points.length > 0) {
       const aggregated: AggregatedJumpLoad = {
@@ -111,6 +117,7 @@ export class AppService {
       if (aggregated.total_seconds >= kMinLoadDurationSeconds) {
         console.log(JSON.stringify(aggregated));
         this.loads.push(aggregated);
+        await firestore.collection('aggregated_loads').add(aggregated);
       }
     } else {
       console.error(`Raw load is empty after filtering: ${JSON.stringify(this.current_load)}`);

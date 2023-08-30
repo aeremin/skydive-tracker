@@ -97,7 +97,7 @@ export class AppService {
   }
 
   private lastPoint() {
-    return this.lastPoint();
+    return this.current_load.points[this.current_load.points.length - 1]
   }
 
   private async onLoadFinished() {

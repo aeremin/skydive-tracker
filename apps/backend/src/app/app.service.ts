@@ -2,6 +2,7 @@ import {Firestore} from '@google-cloud/firestore';
 import {Injectable} from '@nestjs/common';
 import {HttpService} from "@nestjs/axios";
 import {firstValueFrom} from "rxjs";
+import {AggregatedJumpLoad} from "@skydive-tracker/api";
 
 const firestore = new Firestore({databaseId: 'skydive-tracker'});
 
@@ -39,20 +40,6 @@ type AircraftWithTime = Aircraft & { now: number };
 
 interface RawJumpLoad {
   points: AircraftWithTime[];
-}
-
-interface AggregatedJumpLoad {
-  start_timestamp: number;
-  start_altitude: number;
-
-  finish_timestamp: number;
-  finish_altitude: number;
-
-  max_altitude: number;
-
-  total_seconds: number;
-
-  total_points: number;
 }
 
 @Injectable()

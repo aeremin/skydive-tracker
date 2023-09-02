@@ -11,3 +11,22 @@ export interface AggregatedJumpLoad {
 
   total_points: number;
 }
+
+export interface Aircraft {
+  hex: string;
+  type: string;
+  flight: string;
+  r: string;
+  t: string;
+  alt_baro?: number;
+  squawk: string;
+  rr_lat: number;
+  rr_lon: number;
+  alert: number;
+  spi: number;
+  messages: number;
+  seen: number;
+  rssi: number;
+}
+
+export type AircraftWithTime = Aircraft & { now: number };

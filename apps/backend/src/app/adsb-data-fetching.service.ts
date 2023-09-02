@@ -24,7 +24,7 @@ interface RawJumpLoad {
 }
 
 @Injectable()
-export class AppService {
+export class AdsbDataFetchingService {
   private loads: AggregatedJumpLoad[] = [];
   private current_load: RawJumpLoad|undefined = undefined;
   constructor(private readonly httpService: HttpService, private readonly firestoreService: FirestoreService) {

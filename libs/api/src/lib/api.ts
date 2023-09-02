@@ -1,7 +1,9 @@
 export interface AggregatedJumpLoad {
+  // Unix time in milliseconds
   start_timestamp: number;
   start_altitude: number;
 
+  // Unix time in milliseconds
   finish_timestamp: number;
   finish_altitude: number;
 

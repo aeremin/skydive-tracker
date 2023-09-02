@@ -28,12 +28,14 @@ export class AdsbDataFetchingService {
   private loads: AggregatedJumpLoad[] = [];
   private current_load: RawJumpLoad|undefined = undefined;
   constructor(private readonly httpService: HttpService, private readonly firestoreService: FirestoreService) {
-    this.downloadData();
-    setInterval(async () => this.downloadData(), 10000);
+    if (process.env.NODE_ENV == 'production') {
+      this.downloadData();
+      setInterval(async () => this.downloadData(), 10000);
+    }
   }
 
   async getData() {
-    return {message: `Current load: ${JSON.stringify(this.current_load)}, Loads info: ${JSON.stringify(this.loads)}`};
+    return {current_load: this.current_load, loads: this.loads};
   }
 
   private async downloadData() {

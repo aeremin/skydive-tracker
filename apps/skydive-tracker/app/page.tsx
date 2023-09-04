@@ -1,7 +1,8 @@
 'use client';
 
-import Container from 'react-bootstrap/Container';
 import {DayOverview} from "./day_overview";
+import React from "react";
+import {Container} from "@mui/material";
 
 export default async function Index() {
   return (

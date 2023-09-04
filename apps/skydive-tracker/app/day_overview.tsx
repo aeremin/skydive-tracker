@@ -1,8 +1,8 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
 import {AggregatedJumpLoad} from "@skydive-tracker/api";
 import {getTodayLoads} from "./api/backend";
 import moment from "moment";
+import {Table, TableBody, TableCell, TableHead, TableRow} from "@mui/material";
 
 const BEROMUNSTER_ASL_FEET = 2146;
 const METERS_IN_FEET = 0.3048;
@@ -32,25 +32,27 @@ export class DayOverview extends React.Component<unknown, {loads: AggregatedJump
 
   render() {
     return (
-      <Table>
-        <tbody>
-        <tr>
-          <th>#</th>
-          <th>Take off</th>
-          <th>Landing</th>
-          <th>Duration</th>
-          <th>Altitude</th>
-        </tr>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>#</TableCell>
+            <TableCell>Take off</TableCell>
+            <TableCell>Landing</TableCell>
+            <TableCell>Duration</TableCell>
+            <TableCell>Altitude</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
         {this.state.loads.map((l, index) => (
-          <tr key={index}>
-            <td>{index}</td>
-            <td>{this.timestampToHumanReadable(l.start_timestamp)}</td>
-            <td>{this.timestampToHumanReadable(l.finish_timestamp)}</td>
-            <td>{this.durationToHumanReadable(l.total_seconds)}</td>
-            <td>{this.aglMeters(l.max_altitude)}</td>
-          </tr>
+          <TableRow key={index}>
+            <TableCell>{index}</TableCell>
+            <TableCell>{this.timestampToHumanReadable(l.start_timestamp)}</TableCell>
+            <TableCell>{this.timestampToHumanReadable(l.finish_timestamp)}</TableCell>
+            <TableCell>{this.durationToHumanReadable(l.total_seconds)}</TableCell>
+            <TableCell>{this.aglMeters(l.max_altitude)}</TableCell>
+          </TableRow>
         ))}
-        </tbody>
+        </TableBody>
       </Table>
     );
   }

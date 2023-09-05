@@ -10,6 +10,7 @@
     "@fontsource/roboto": "^5.0.8",
     "@google-cloud/firestore": "^6.7.0",
     "@mui/material": "^5.14.7",
+    "@mui/x-date-pickers": "^6.12.1",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/common": "^10.0.2",
     "@nestjs/core": "^10.0.2",

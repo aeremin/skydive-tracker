@@ -1,21 +1,27 @@
 import React from 'react';
 import {AggregatedJumpLoad} from "@skydive-tracker/api";
-import {getTodayLoads} from "./api/backend";
+import {getLoadsAtDate, getTodayLoads} from "./api/backend";
 import moment from "moment";
 import {Table, TableBody, TableCell, TableHead, TableRow} from "@mui/material";
 
 const BEROMUNSTER_ASL_FEET = 2146;
 const METERS_IN_FEET = 0.3048;
 
-export class DayOverview extends React.Component<unknown, {loads: AggregatedJumpLoad[]}> {
+export class DayOverview extends React.Component<{date: moment.Moment}, {loads: AggregatedJumpLoad[]}> {
   state: {loads: AggregatedJumpLoad[]} = {loads: []};
 
-  async componentDidMount() {
+  override async componentDidMount() {
     await this.loadLoads();
   }
 
+  override async componentDidUpdate(prevProps : {date: moment.Moment}) {
+    if (prevProps.date != this.props.date) {
+      await this.loadLoads();
+    }
+  }
+
   async loadLoads() {
-    this.setState({loads: await getTodayLoads()});
+    this.setState({loads: await getLoadsAtDate(this.props.date)});
   }
 
   private timestampToHumanReadable(t: number): string {
@@ -30,7 +36,7 @@ export class DayOverview extends React.Component<unknown, {loads: AggregatedJump
     return Math.floor((aslFeet - BEROMUNSTER_ASL_FEET) * METERS_IN_FEET);
   }
 
-  render() {
+  override render() {
     return (
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>

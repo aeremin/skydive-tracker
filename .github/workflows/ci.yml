@@ -7,4 +7,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: bahmutov/npm-install@v1
-      - run: nx export skydive-tracker --prod
+      - run: npx nx export skydive-tracker --prod
+      - uses: actions-hub/gcloud@412.0.0
+        env:
+          PROJECT_ID: alice-larp
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS  }}
+          CLI: gsutil
+        with:
+          args: -h "Cache-Control:no-cache,max-age=0" cp dist/apps/skydive-tracker/exporter/* gs://skydive-tracker.evarun.ru

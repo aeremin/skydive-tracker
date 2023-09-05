@@ -14,4 +14,4 @@ jobs:
           APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS  }}
           CLI: gsutil
         with:
-          args: -h "Cache-Control:no-cache,max-age=0" cp dist/apps/skydive-tracker/exporter/* gs://skydive-tracker.aerem.in
+          args: -h "Cache-Control:no-cache,max-age=0" cp dist/apps/skydive-tracker/exported/* gs://skydive-tracker.aerem.in

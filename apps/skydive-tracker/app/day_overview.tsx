@@ -51,7 +51,7 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
         <TableBody>
         {this.state.loads.map((l, index) => (
           <TableRow key={index}>
-            <TableCell>{index}</TableCell>
+            <TableCell>{index + 1}</TableCell>
             <TableCell>{this.timestampToHumanReadable(l.start_timestamp)}</TableCell>
             <TableCell>{this.timestampToHumanReadable(l.finish_timestamp)}</TableCell>
             <TableCell>{this.durationToHumanReadable(l.total_seconds)}</TableCell>

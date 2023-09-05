@@ -38,10 +38,10 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
 
   override render() {
     return (
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+      <Table size="small" aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>#</TableCell>
+            <TableCell sx={{width: "2em"}}>#</TableCell>
             <TableCell>Take off</TableCell>
             <TableCell>Landing</TableCell>
             <TableCell>Duration</TableCell>
@@ -51,7 +51,7 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
         <TableBody>
         {this.state.loads.map((l, index) => (
           <TableRow key={index}>
-            <TableCell>{index + 1}</TableCell>
+            <TableCell sx={{width: "2em"}}>{index + 1}</TableCell>
             <TableCell>{this.timestampToHumanReadable(l.start_timestamp)}</TableCell>
             <TableCell>{this.timestampToHumanReadable(l.finish_timestamp)}</TableCell>
             <TableCell>{this.durationToHumanReadable(l.total_seconds)}</TableCell>

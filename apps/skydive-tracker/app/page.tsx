@@ -28,7 +28,7 @@ class Page extends React.Component<unknown, {date: moment.Moment}> {
 
   override render() {
     return (
-      <Container>
+      <Container maxWidth="sm">
         <DateCalendar value={this.state.date} onChange={(v) => this.setValueChecked(v)} />
         <DayOverview date={this.state.date}/>
       </Container>

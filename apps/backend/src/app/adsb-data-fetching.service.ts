@@ -71,7 +71,7 @@ export class AdsbDataFetchingService {
   }
 
   private async onLoadFinished() {
-    this.current_load.points = this.current_load.points.filter(p => p.alt_baro != undefined);
+    this.current_load.points = this.current_load.points.filter(p => Number.isInteger(p.alt_baro));
     if (this.current_load.points.length > 0) {
       const aggregated: AggregatedJumpLoad = {
         start_timestamp: this.current_load.points[0].now,

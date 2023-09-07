@@ -22,4 +22,9 @@ export class AppController {
   getLoadsAt(@Param('date') date: string) {
     return this.firestoreService.getLoadsAt(date);
   }
+
+  @Get('loads/ongoing')
+  getOngoingLoad() {
+    return this.firestoreService.getOngoingLoad();
+  }
 }

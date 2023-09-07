@@ -14,6 +14,18 @@ export interface AggregatedJumpLoad {
   total_points: number;
 }
 
+export interface OngoingJumpLoad {
+  // Unix time in milliseconds
+  start_timestamp: number;
+  start_altitude: number;
+
+  // Unix time in milliseconds
+  current_timestamp: number;
+  current_altitude: number;
+
+  total_seconds: number;
+}
+
 export interface Aircraft {
   hex: string;
   type: string;

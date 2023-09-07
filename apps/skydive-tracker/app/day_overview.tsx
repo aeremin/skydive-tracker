@@ -2,7 +2,7 @@ import React from 'react';
 import {AggregatedJumpLoad} from "@skydive-tracker/api";
 import {getLoadsAtDate, getTodayLoads} from "./api/backend";
 import moment from "moment";
-import {Table, TableBody, TableCell, TableHead, TableRow} from "@mui/material";
+import {Table, TableBody, TableCell, TableHead, TableRow, Theme, Typography, useTheme} from "@mui/material";
 
 const BEROMUNSTER_ASL_FEET = 2146;
 const METERS_IN_FEET = 0.3048;
@@ -36,6 +36,18 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
     return Math.floor((aslFeet - BEROMUNSTER_ASL_FEET) * METERS_IN_FEET);
   }
 
+  private altitudeColor(theme: Theme, aglMeters: number): string {
+    if (aglMeters < 2800) {
+      return theme.palette.error.light;
+    }
+
+    if (aglMeters < 3600) {
+      return theme.palette.warning.light;
+    }
+
+    return theme.palette.text.primary
+  }
+
   override render() {
     return (
       <Table size="small" aria-label="simple table">
@@ -55,7 +67,11 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
             <TableCell>{this.timestampToHumanReadable(l.start_timestamp)}</TableCell>
             <TableCell>{this.timestampToHumanReadable(l.finish_timestamp)}</TableCell>
             <TableCell>{this.durationToHumanReadable(l.total_seconds)}</TableCell>
-            <TableCell>{this.aglMeters(l.max_altitude)}</TableCell>
+            <TableCell>
+              <Typography variant="body2" color={theme => this.altitudeColor(theme, this.aglMeters(l.max_altitude))}>
+                {this.aglMeters(l.max_altitude)}
+              </Typography>
+            </TableCell>
           </TableRow>
         ))}
         </TableBody>

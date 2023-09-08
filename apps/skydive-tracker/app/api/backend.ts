@@ -16,5 +16,5 @@ export async function getLoadsAtDate(date: moment.Moment): Promise<AggregatedJum
 
 export async function getOngoingLoad(): Promise<OngoingJumpLoad | undefined> {
   const response = await axios.get<OngoingJumpLoad | undefined>(`${BACKEND_BASE_URL}/loads/ongoing`);
-  return response.data;
+  return response.data || undefined;
 }

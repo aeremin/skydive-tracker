@@ -46,6 +46,7 @@ export class DayOverview extends React.Component<{date: moment.Moment}, DayOverv
   }
 
   private aglMeters(aslFeet: number): number {
+    if (aslFeet <= 0) return 0;
     return Math.floor((aslFeet - BEROMUNSTER_ASL_FEET) * METERS_IN_FEET);
   }
 

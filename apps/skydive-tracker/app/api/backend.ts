@@ -1,4 +1,4 @@
-import {AggregatedJumpLoad} from "@skydive-tracker/api";
+import {AggregatedJumpLoad, OngoingJumpLoad} from "@skydive-tracker/api";
 import axios from "axios";
 import moment from "moment";
 
@@ -11,5 +11,10 @@ export async function getTodayLoads(): Promise<AggregatedJumpLoad[]> {
 
 export async function getLoadsAtDate(date: moment.Moment): Promise<AggregatedJumpLoad[]> {
   const response = await axios.get<AggregatedJumpLoad[]>(`${BACKEND_BASE_URL}/loads/date/${date.format("YYYY-MM-DD")}`);
+  return response.data;
+}
+
+export async function getOngoingLoad(): Promise<OngoingJumpLoad | undefined> {
+  const response = await axios.get<OngoingJumpLoad | undefined>(`${BACKEND_BASE_URL}/loads/ongoing`);
   return response.data;
 }

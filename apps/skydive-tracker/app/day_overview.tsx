@@ -1,14 +1,20 @@
 import React from 'react';
-import {AggregatedJumpLoad} from "@skydive-tracker/api";
-import {getLoadsAtDate, getTodayLoads} from "./api/backend";
+import {AggregatedJumpLoad, OngoingJumpLoad} from "@skydive-tracker/api";
+import {getLoadsAtDate, getOngoingLoad, getTodayLoads} from "./api/backend";
 import moment from "moment";
 import {Table, TableBody, TableCell, TableHead, TableRow, Theme, Typography, useTheme} from "@mui/material";
+import {ReactJSXElement} from "@emotion/react/types/jsx-namespace";
 
 const BEROMUNSTER_ASL_FEET = 2146;
 const METERS_IN_FEET = 0.3048;
 
-export class DayOverview extends React.Component<{date: moment.Moment}, {loads: AggregatedJumpLoad[]}> {
-  state: {loads: AggregatedJumpLoad[]} = {loads: []};
+interface DayOverviewState {
+  loads: AggregatedJumpLoad[];
+  ongoing: OngoingJumpLoad | undefined;
+}
+
+export class DayOverview extends React.Component<{date: moment.Moment}, DayOverviewState> {
+  state: DayOverviewState = {loads: [], ongoing: undefined};
 
   override async componentDidMount() {
     await this.loadLoads();
@@ -20,8 +26,15 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
     }
   }
 
+  private isToday(): boolean {
+    return this.props.date.startOf("day") == moment().startOf("day");
+  }
+
   async loadLoads() {
-    this.setState({loads: await getLoadsAtDate(this.props.date)});
+    this.setState({
+      loads: await getLoadsAtDate(this.props.date),
+      ongoing: this.isToday() ? await getOngoingLoad() : undefined,
+    });
   }
 
   private timestampToHumanReadable(t: number): string {
@@ -46,6 +59,18 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
     }
 
     return theme.palette.text.primary
+  }
+
+  renderOngoing(): ReactJSXElement {
+    if (this.state.ongoing == undefined) return (<div/>);
+    const index = this.state.loads.length;
+    return (<TableRow key={index}>
+      <TableCell sx={{width: "2em"}}>{index + 1}</TableCell>
+      <TableCell>{this.timestampToHumanReadable(this.state.ongoing.start_timestamp)}</TableCell>
+      <TableCell>Ongoing</TableCell>
+      <TableCell>{this.durationToHumanReadable(this.state.ongoing.total_seconds)}</TableCell>
+      <TableCell>{this.aglMeters(this.state.ongoing.current_altitude)}</TableCell>
+    </TableRow>)
   }
 
   override render() {
@@ -74,6 +99,7 @@ export class DayOverview extends React.Component<{date: moment.Moment}, {loads: 
             </TableCell>
           </TableRow>
         ))}
+        {this.renderOngoing()}
         </TableBody>
       </Table>
     );

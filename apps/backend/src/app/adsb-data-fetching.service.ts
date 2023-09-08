@@ -51,9 +51,9 @@ export class AdsbDataFetchingService {
     if (this.current_load == undefined) {
       return {
         start_timestamp: now,
-        start_altitude: ac.alt_baro,
+        start_altitude: ac.alt_baro || 0,
         current_timestamp: now,
-        current_altitude: ac.alt_baro,
+        current_altitude: ac.alt_baro || 0,
         total_seconds: 0,
       }
     } else {

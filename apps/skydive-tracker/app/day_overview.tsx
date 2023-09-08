@@ -27,7 +27,7 @@ export class DayOverview extends React.Component<{date: moment.Moment}, DayOverv
   }
 
   private isToday(): boolean {
-    return this.props.date.startOf("day") == moment().startOf("day");
+    return this.props.date.isSame(moment(), "day");
   }
 
   async loadLoads() {
@@ -61,8 +61,8 @@ export class DayOverview extends React.Component<{date: moment.Moment}, DayOverv
     return theme.palette.text.primary
   }
 
-  renderOngoing(): ReactJSXElement {
-    if (this.state.ongoing == undefined) return (<div/>);
+  renderOngoing() {
+    if (this.state.ongoing == undefined) return undefined;
     const index = this.state.loads.length;
     return (<TableRow key={index}>
       <TableCell sx={{width: "2em"}}>{index + 1}</TableCell>

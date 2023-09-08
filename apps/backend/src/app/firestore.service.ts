@@ -18,7 +18,7 @@ export class FirestoreService {
 
   async publishFinishedAggregatedLoad(l: AggregatedJumpLoad) {
     await firestore.collection(this.kAggregatedLoadsDbPath).add(l);
-    await firestore.collection(this.kOngoingLoadDbPath).doc(this.kOngoingLoadId).set(undefined);
+    await firestore.collection(this.kOngoingLoadDbPath).doc(this.kOngoingLoadId).delete();
   }
 
   publishOngoingLoad(l: OngoingJumpLoad) {

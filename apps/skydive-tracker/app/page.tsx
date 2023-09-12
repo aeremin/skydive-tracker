@@ -8,6 +8,12 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { DateCalendar } from '@mui/x-date-pickers';
 import moment from "moment";
 
+moment.updateLocale("en", {
+  week: {
+    dow: 1
+  }
+});
+
 export default async function Index() {
   return (
     <div className="app">

@@ -17,7 +17,7 @@ interface AdsbResponse {
   ptime: number;
 }
 
-const kPlaneIcao = '3D72AB';
+const kPlaneIcao = '4B3282';
 
 interface RawJumpLoad {
   points: AircraftWithTime[];
